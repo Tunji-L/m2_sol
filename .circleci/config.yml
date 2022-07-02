@@ -7,7 +7,7 @@ jobs:
     
     steps:
       - checkout
-      - run: npm -i
+      - run: npm i
       - save_cache:
           key: "npm-packages"
           paths:
@@ -22,7 +22,7 @@ jobs:
       - checkout
       - restore_cache:
           key: "npm-packages"
-      - run: npm -i
+      - run: npm i
       - run: npm run test
 
   analyze:
