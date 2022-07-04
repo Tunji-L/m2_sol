@@ -61,7 +61,7 @@ jobs:
             echo "[all]" > ~/cach/inventory.txt
             aws ec2 describe-instances \
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-            --filters "Name=tag:Project,Values=Udacity" \
+            --filters "Name=tag:Project,Values=udacity" \
             --output text >> ~/cach/inventory.txt
       - save_cache:
           key: "inventory file"
@@ -75,7 +75,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["44:cc:2d:3c:4d:03:ab:c1:b7:13:4b:be:23:f8:2e:47"]
+          fingerprints: ["05:2e:11:e1:75:a5:8a:e2:5b:d0:77:de:91:12:80:e8"]
       - restore_cache:
           key: "inventory file"
       - run:
