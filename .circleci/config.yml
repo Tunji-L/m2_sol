@@ -57,15 +57,16 @@ jobs:
       - run:
           name: "generate inventory file"
           command: |
-            echo "[all]" > ~/inventory.txt
+            mkdir -p ~/cach
+            echo "[all]" > ~/cach/inventory.txt
             aws ec2 describe-instances \
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
             --filters "Name=tag:Project,Values=Udacity" \
-            --output text >> ~/inventory.txt
-      - persist_to_workspace:
-          root: ~/
+            --output text >> ~/cach/inventory.txt
+      - save_cache:
+          key: "inventory file"
           paths:
-            - inventory.txt
+            - ~/cach
 
   configure_infrastructure:
     docker:
@@ -75,8 +76,8 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints: ["44:cc:2d:3c:4d:03:ab:c1:b7:13:4b:be:23:f8:2e:47"]
-      - attach_workspace:
-          at: ~/workspace
+      - restore_cache:
+          key: "inventory file"
       - run:
           name: install dependencies
           command: |
@@ -84,7 +85,7 @@ jobs:
       - run:
           name: configure server
           command: |
-            ansible-playbook -i ~/inventory.txt main_remote.yml
+            ansible-playbook -i inventory.txt main_remote.yml
 
 workflows:
   my_workflow:
