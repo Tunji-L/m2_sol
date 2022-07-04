@@ -85,7 +85,7 @@ jobs:
       - run:
           name: configure server
           command: |
-            ansible-playbook -i inventory.txt main_remote.yml
+            ansible-playbook -i ~/cach/inventory.txt main_remote.yml
 
 workflows:
   my_workflow:
