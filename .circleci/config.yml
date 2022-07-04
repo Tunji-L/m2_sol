@@ -50,8 +50,8 @@ jobs:
               --region us-east-1
 
 workflows:
-  # my_workflow:
-  #   jobs:
+  my_workflow:
+    jobs:
   #     - build
   #     - test:
   #         requires:
@@ -59,4 +59,4 @@ workflows:
   #     - analyze:
   #         requires:
   #           - test
-      - create_infrastructure
+        - create_infrastructure
