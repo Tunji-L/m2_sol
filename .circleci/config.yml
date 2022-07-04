@@ -57,14 +57,13 @@ jobs:
       - run:
           name: "generate inventory file"
           command: |
-            mkdir -p workspace
-            echo "[all]" > /tmp/workspace/inventory.txt
+            echo "[all]" > ~/inventory.txt
             aws ec2 describe-instances \
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
             --filters "Name=tag:Project,Values=Udacity" \
-            --output text >> /tmp/workspace/inventory.txt
+            --output text >> ~/inventory.txt
       - persist_to_workspace:
-          root: /tmp/workspace
+          root: ~
           paths:
             - inventory.txt
 
@@ -77,15 +76,15 @@ jobs:
       - add_ssh_keys:
           fingerprints: ["44:cc:2d:3c:4d:03:ab:c1:b7:13:4b:be:23:f8:2e:47"]
       - attach_workspace:
-          at: /tmp/workspace
+          at: ~/workspace
       - run:
-          name: instal dependencies
+          name: install dependencies
           command: |
             apk add --update ansible
       - run:
           name: configure server
           command: |
-            ansible-playbook -i /tmp/workspace/inventory.txt main_remote.yml
+            ansible-playbook -i ~/inventory.txt main_remote.yml
 
 workflows:
   my_workflow:
