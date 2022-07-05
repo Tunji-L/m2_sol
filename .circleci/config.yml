@@ -57,7 +57,7 @@ jobs:
       - run:
           name: "unarchiving"
           command: |
-            yum install tar
+            yum install tar -y
       - run:
           name: "generate inventory file"
           command: |
