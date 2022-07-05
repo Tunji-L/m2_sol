@@ -1,13 +1,12 @@
 version: 2.1
 
-commands:
-  destroy_environment:
-    steps:
-      - run:
-          name: Destroy Environment
-          when: on_fail
-          command: |
-            aws cloudformation delete-stack --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5}
+# commands:
+#   destroy_environment:
+#     steps:
+#       - run:
+#           name: Destroy Environment
+#           command: |
+#             aws cloudformation delete-stack --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5}
 
 jobs:
   # build:
@@ -44,19 +43,19 @@ jobs:
   #         key: "npm-packages"
   #     - run: npm audit
 
-  create_infrastructure:
-    docker: 
-      - image: amazon/aws-cli
+  # create_infrastructure:
+  #   docker: 
+  #     - image: amazon/aws-cli
 
-    steps:
-      - checkout
-      - run:
-          name: Create cloud formation stack
-          command: |
-            aws cloudformation deploy \
-              --template-file template.yml \
-              --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
-              --region us-east-1
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Create cloud formation stack
+  #         command: |
+  #           aws cloudformation deploy \
+  #             --template-file template.yml \
+  #             --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
+  #             --region us-east-1
 
   # inventory:
   #   docker:
@@ -104,24 +103,40 @@ jobs:
   #         command: |
   #           ansible-playbook -i ~/inventory.txt main_remote.yml
 
-  smoke_test:
-    docker: 
-      - image: alpine:latest
+  # smoke_test:
+  #   docker: 
+  #     - image: alpine:latest
+
+  #   steps:
+  #     - run: apk add --update curl
+  #     - run:
+  #         name: smoke test
+  #         command: |
+  #           URL="https://blog.udacity.com/"
+  #           # Test if website exists
+  #           if curl -s --head ${URL}
+  #           then
+  #             return 1
+  #           else:
+  #             return 1
+  #           fi
+  #     - destroy_environment
+  #       when: on_fail
+
+  create_and_deploy_front_end:
+    docker:
+      - image: amazon/aws-cli
 
     steps:
-      - run: apk add --update curl
+      - checkout
       - run:
-          name: smoke test
+          name: Execute bucket.yml - Create Cloudformation Stack
           command: |
-            URL="https://blog.udacity.com/"
-            # Test if website exists
-            if curl -s --head ${URL}
-            then
-              return 1
-            else:
-              return 1
-            fi
-      - destroy_environment
+            aws cloudformation deploy \
+            --template-file bucket.yml \
+            --stack-name stack-create-bucket-${CIRCLE_WORKFLOW_ID:0:5} \
+            --parameter-overrides MyBucketName="mybucket-${CIRCLE_WORKFLOW_ID:0:5}"
+      - run: aws s3 sync index.html s3://mybucket-${CIRCLE_WORKFLOW_ID:0:5} --delete
 
 workflows:
   my_workflow:
@@ -133,13 +148,14 @@ workflows:
       # - analyze:
       #     requires:
       #       - test
-      - create_infrastructure
+      # - create_infrastructure
       # - inventory:
       #     requires:
       #       - create_infrastructure
       # - configure_infrastructure:
       #     requires:
       #       - inventory
-      - smoke_test:
-          requires:
-            - create_infrastructure
+      # - smoke_test:
+      #     requires:
+      #       - create_infrastructure
+      - create_and_deploy_front_end
