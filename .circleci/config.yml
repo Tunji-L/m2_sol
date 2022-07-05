@@ -55,6 +55,10 @@ jobs:
 
     steps:
       - run:
+          name: "unarchiving"
+          command: |
+            sudo yum install tar
+      - run:
           name: "generate inventory file"
           command: |
             mkdir -p ~/cach
@@ -63,10 +67,10 @@ jobs:
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
             --filters "Name=tag:Project,Values=udacity" \
             --output text >> ~/cach/inventory.txt
-      - save_cache:
-          key: "inventory file"
+      - persist_to_workspace:
+          root: ~/
           paths:
-            - ~/cach
+            - inventory.txt
 
   configure_infrastructure:
     docker:
@@ -76,8 +80,12 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints: ["05:2e:11:e1:75:a5:8a:e2:5b:d0:77:de:91:12:80:e8"]
-      - restore_cache:
-          key: "inventory file"
+      - run:
+          name: "unarchiving"
+          command: |
+            pip install tar.gz
+      - attach_workspace:
+          at: ~/
       - run:
           name: install dependencies
           command: |
@@ -85,7 +93,7 @@ jobs:
       - run:
           name: configure server
           command: |
-            ansible-playbook -i ~/cach/inventory.txt main_remote.yml
+            ansible-playbook -i ~/inventory.txt main_remote.yml
 
 workflows:
   my_workflow:
