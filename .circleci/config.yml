@@ -140,6 +140,6 @@ workflows:
       # - configure_infrastructure:
       #     requires:
       #       - inventory
-      - smoke_test
+      - smoke_test:
           requires:
             - create_infrastructure
