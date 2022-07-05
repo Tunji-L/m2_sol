@@ -133,11 +133,11 @@ workflows:
       # - analyze:
       #     requires:
       #       - test
-        - create_infrastructure
-      #   - inventory:
-      #       requires:
-      #         - create_infrastructure
-      #   - configure_infrastructure:
-      #       requires:
-      #         - inventory
+      - create_infrastructure
+      # - inventory:
+      #     requires:
+      #       - create_infrastructure
+      # - configure_infrastructure:
+      #     requires:
+      #       - inventory
       - smoke_test
